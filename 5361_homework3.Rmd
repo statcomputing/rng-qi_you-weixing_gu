@@ -1,0 +1,350 @@
+---
+title: "HW3"
+author: "Weixing Gu&Qi You"
+date: "February 26, 2018"
+output:
+  pdf_document: default
+  html_document: default
+---
+##Question 1
+#a
+\begin{align}
+&Q(\psi|\psi^{(k)}) = \sum_{i=1}^n\sum_{j=1}^np_{ij}^{(k+1)}\{log\pi+log\phi(y_i-x_i^T\beta_j;0,\sigma^2\}&\\
+\end{align}
+\begin{align}
+&\sum_{j=1}^m\pi_j=1&\\
+\end{align}
+\begin{align}
+&L(\pi_1,\cdots,\pi_m,\lambda) = Q(\psi|\psi(k)) - \lambda(\sum_{j=1}^m\pi_j-1) = 0&\\
+\end{align}
+\begin{align}
+&L_{\pi_j}' = 0 L_\lambda' = 0, j = 1,2,\cdots,m&\\
+\end{align}
+\begin{align}
+&\sum_{i=1}^np_{ij}^{(k+1)}\frac{1}{\pi_j}-\lambda = 0, j = 1,2,\cdots,m&\\
+\end{align}
+\begin{align}
+&\pi_j = \frac{\sum_{i=1}^np_{ij}^{(k+1)}}{\lambda}&\\
+\end{align}
+\begin{align}
+&\sum_{j=1}^m\pi_j = \frac{\sum_{j=1}^m\sum_{i=1}^np_{ij}^{(k+1)}}{\lambda}&\\
+&= \frac{\sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}}{\lambda}&\\
+&= \frac{n}{\lambda} = 1&\\
+\end{align}
+\begin{align}
+&\therefore\lambda = n&\\
+\end{align}
+\begin{align}
+&\therefore\pi_j = \frac{\sum_{i=1}^np_{ij}^{(k+1)}}{n}&
+\end{align}
+
+#b
+\begin{align}
+&Q(\psi|\psi^{(k)}) = \sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}\{log\pi_j+log(\frac{1}{\sqrt{2\pi}\sigma}exp[-\frac{(y_i-x_i^T\beta_j)^2}{2\sigma^2}])\}&\\
+& = \sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}\{log\pi_i+log(\frac{1}{\sqrt{2\pi}\sigma})+[-\frac{(y_i-x_i^T\beta_j)^2}{2\sigma^2}]\}&\\
+\end{align}
+
+It's the sum of m quadratic forms, where each form includes a single beta_j for every j.
+
+\begin{align}
+&\sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}(-\frac{(y_i-x_i^T\beta_j)^2}{2\sigma^2})&\\
+& = -\sum_{i=1}^np_{ij}^{(k+1)}[\frac{(y_i-x_i^T\beta_j)^2}{2\sigma^2}]&\\
+&= \sum_{i=1}^np_{ij}^{(k+1)}[x_i^T(\frac{y_i}{x_i^T}-\beta_j)]^2&\\
+&= \sum_{i=1}^np_{ij}^{(k+1)}x_ix_i^T(\frac{y_i}{x_i^T}-\beta_j)^2&\\
+\end{align}
+\begin{align}
+&\beta_j = \sum_{i=1}^np_{ij}x_ix_i^T\frac{y_i}{x_i^T} = \sum_{i=1}^np_{ij}x_iy_i^T&\\
+\end{align}
+
+#c
+\begin{align}
+&\sigma^{2(k+1)}&\\
+&= \frac{\sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}(y_i-x_i^T\beta_j^{(k+1)})^2}{\sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}}&\\
+&= \frac{\sum_{i=1}^n\sum_{j=1}^mp_{ij}^{(k+1)}(y_i-x_i^T\beta_j^{(k+1)})^2}{n}&\\
+\end{align}
+
+##Question 2
+#a
+\begin{align}
+&g(x)\propto(2x^{\theta-1}+x^{\theta-\frac{1}{2}}e^{-x})&\\
+\end{align}
+\begin{align}
+&C\int_0^\infty(2x^{\theta-1}+x^{\theta-\frac{1}{2}})e^{-x}dx = 1&\\
+\end{align}
+\begin{align}
+&2C\Gamma(\theta)+C\Gamma(\theta+\frac{1}{2}) = 1&\\
+\end{align}
+\begin{align}
+&C = \frac{1}{2\Gamma(\theta)+\Gamma(\theta+\frac{1}{2})}&\\
+\end{align}
+\begin{align}
+&\therefore g(x) = \frac{2\Gamma(\theta)}{2\Gamma(\theta)+\Gamma(\theta+\frac{1}{2})}\frac{1}{\Gamma(\theta)}x^{\theta-1}e^{-x}+\frac{\Gamma(\theta+\frac{1}{2})}{2\Gamma(\theta)+\Gamma(\theta+\frac{1}{2})}*\frac{1}{\Gamma(\theta+\frac{1}{2})}x^{\theta-\frac{1}{2}}e^{-x}&\\
+\end{align}
+
+#b
+Notice that integration of g/C is 1,and this is an undecreasing function, so we use inverse function to sample g. By this way we first sample u~uniform(0,1), and compute the root of intergrate(g,0,x). In this way we can sample 'x'. Then by density function, we come out the result.
+We set theta to be 2
+```{r setup, include=FALSE}
+
+theta <- 2
+C <- 2 * gamma(theta) + gamma(theta + 1/2)
+cc <- 2+(3/4)*(pi^0.5)
+g <- function(x){
+  (2*x+x^1.5)*exp(-x)/C
+}
+
+a <- function(x) {
+  return(integrate(g,lower = 0,upper = x)$value-u)
+}
+
+#result <- uniroot(a,c(0,10))$root
+sample1 <- c()
+for (i in 1:10000){
+  u <- runif(1,0,1)
+  result <- uniroot(a,c(0,20))
+  sample1 <- c(sample1,result$root)
+}
+#sample1 <- sample1
+sample2 <- density(sample1)
+
+ga <- function(x){
+  (2*x+x^1.5)*exp(-x)
+}
+
+x <- seq(0,10,0.001)
+tru <- sapply(x,g)
+
+plot(x,tru,type='l',col='red',main='sample g',xlab = 'x',ylab='g/C')
+lines(sample2)
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+```{r ppp}
+plot(x,tru,type='l',col='red',main='sample g',xlab = 'x',ylab='g/C')
+lines(sample2)
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+#c
+\begin{align}
+&f'(x) = \frac{\frac{2+\sqrt{x}}{2\sqrt{4+x}}-\frac{\sqrt{4+x}}{2\sqrt{x}}}{(2+\sqrt{x})^2}&\\ 
+&= \frac{\frac{2\sqrt{x}-4}{2\sqrt{4+x}\sqrt{x}}}{(2+\sqrt{x})^2}&\\
+\end{align}
+\begin{align}
+&x\geq 4, f(x)\uparrow&\\
+\end{align}
+\begin{align}
+&x\leq 4, f(x)\downarrow&\\
+\end{align}
+\begin{align}
+&\therefore maxf(x) = max(f(0), f(\infty))&\\
+\end{align}
+\begin{align}
+&f(\infty) = 1, f(0) = 1&\\
+\end{align}
+\begin{align}
+&\therefore \sqrt{4+x}\leq 2+\sqrt{x}&\\
+\end{align}
+\begin{align}
+&\therefore \sqrt{4+x}x^{\theta-1}e^{-x}\leq 2+\sqrt{x}x^{\theta-1}e^{-x}&\\
+\end{align}
+\begin{align}
+&f(x) = \sqrt{4+x}x^{\theta-1}e^{-x}\leq (2x^{\theta-1}+x^{\theta-\frac{1}{2}})e^{-x} = g(x)&\\
+\end{align}
+Therefore, g(x) can be f(x)'s envolope.
+
+Actually, we can see that f is smaller than g a.s. So here we set alpha to be 1 is fine.
+
+We also set theta to be 2
+```{r rrr, include=FALSE}
+
+theta <- 2
+C <- 1 / (2 * gamma(theta) + gamma(theta + 1/2))
+g <- function(x){
+  C*(2*x+x^1.5)*exp(-x)
+}
+
+a <- function(x) {
+  return(integrate(g,lower = 0,upper = x)$value-u)
+}
+
+textfu <- function(x){
+  return((x+4)^0.5*x*exp(-x))
+}
+
+k <- integrate(textfu,lower = 0,upper = 20)$value
+sample3 <- array()
+for(i in 1:10000){
+  diff <- 1
+  while(diff>0){
+    u <- runif(1)
+    result <- uniroot(a,c(0,20))
+    u1 <- runif(1)
+    diff <- u1-textfu(result$root)/g(result$root)
+  }
+  sample3[i] <- result$root
+}
+
+xx <- density(sample3)
+sa <- seq(0,20,0.01)
+saa <- sapply(sa,textfu)
+plot(xx,main='Rejection sample f by envolope function g')
+lines(sa,saa/k,col='red')
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+```{r qqq}
+plot(xx,main='Rejection sample f by envelope function g',xlab='x',ylab = 'f/integrate(f)')
+lines(sa,saa/k,col='red')
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+##Question3
+#a
+\begin{align}
+&f_1(x) = \frac{x^{\theta-1}}{1+x^2}\leq x^{\theta-1} = g_1(x), 0<x<1&\\
+\end{align}
+\begin{align}
+&f_2(x) = \sqrt{2+x^2}(1-x)^{\beta-1} < 2(1-x)^{\beta-1} = g_2(x), 0<x<1&\\
+\end{align}
+\begin{align}
+&C_1\int_0^1g_1(x) = 1&\\
+\end{align}
+\begin{align}
+&C_1\int_0^1x^{\theta-1}dx = C_1\frac{x^\theta}{\theta}|_0^1 = \frac{C_1}{\theta} = 1&\\
+\end{align}
+\begin{align}
+&\therefore C_1 = \theta&\\
+\end{align}
+Similarily
+\begin{align}
+C_2 = \frac{\beta}{2}
+\end{align}
+Here we sample g1 and g2 saperately and put them together to sample f. Similarly, we use inverse function to sample them. 
+
+We set coordinates (theta,beta) to be (3,9)
+```{r code, include=FALSE}
+theta <- 3
+beta <- 6
+
+C1 <- 0.4
+C2 <- 0.475
+
+q1 <- function(x) x^(theta-1)/(1+x^2)
+
+q2 <- function(x) ((2+x^2)^0.5)*(1-x)^(beta-1)
+
+target <- function(x){
+  return(q1(x)+q2(x))
+}
+
+k <- integrate(target,0,1)$value
+
+g1 <- function(x) x^(theta-1)*theta
+
+inverse_fun_g1 <- function(x){
+  return(integrate(g1,0,x)$value-u)
+}
+
+g2 <- function(x) beta*(1-x)^(beta-1)
+
+inverse_fun_g2 <- function(x){
+  return(integrate(g2,0,x)$value-u)
+}
+
+sample1 <- array()
+
+
+for(i in 1:10000){
+  u1 <- runif(1)
+  diff <- 1
+  if (u1<C1/(C1+C2)){
+    while(diff>0){
+      u <- runif(1)
+      result <- uniroot(inverse_fun_g1,c(0,1))$root
+      u2 <- runif(1)
+      diff <- u2-q1(result)/(C1*g1(result))
+    }
+    sample1[i] <- result
+    }else {
+      while(diff>0){
+        u <- runif(1)
+        result <- uniroot(inverse_fun_g2,c(0,1))$root
+        u2 <- runif(1)
+        diff <- u2-q2(result)/(C2*g2(result))
+      }
+      sample1[i] <- result
+  }
+}
+
+sample2 <- density(sample1)
+sa <- seq(0,1,0.01)
+saa <- sapply(sa, target)
+plot(sample2,main='Rejection sample f from two components')
+lines(sa,saa/k,col='red')
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+```{r plot}
+plot(sample2,main='Rejection sample f from two components',xlab='x',ylab = 'f/intergrate(f)')
+lines(sa,saa/k,col='red')
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+#b
+This section we se g to be g1+g2, and set alpha to be 1. By sampling g we can sample f.
+
+We set coordinates (theta,beta) to be (3,4)
+```{r function, include=FALSE}
+theta <- 3
+beta <- 4
+
+
+C1 <- 1/theta
+C2 <- 3^(0.5)/beta
+
+q1 <- function(x) x^(theta-1)/(1+x^2)
+
+q2 <- function(x) ((2+x^2)^0.5)*(1-x)^(beta-1)
+
+target <- function(x){
+  return(q1(x)+q2(x))
+}
+
+g1 <- function(x) x^(theta-1)*theta
+g2 <- function(x) beta*(1-x)^(beta-1)
+g <- function(x){
+  return((g1(x)+g2(x))/2)
+}
+
+inverse_fun_g <- function(x){
+  return(integrate(g,0,x)$value-u)
+}
+
+k <- integrate(target,0,1)$value
+
+sample1 <- array()
+for(i in 1:10000){
+  diff <- 1
+  while(diff>0){
+    u <- runif(1)
+    result <- uniroot(inverse_fun_g,c(0,1))$root
+    u1 <- runif(1)
+    diff <- u1-target(result)/g(result)
+  }
+  sample1[i] <- result
+}
+
+sample2 <- density(sample1)
+sa <- seq(0,1,0.01)
+saa <- sapply(sa, target)
+plot(sample2)
+lines(sa,saa/k,col='red')
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
+
+```{r graph}
+plot(sample2,main='Rejection sample f from the whole of two components',xlab = 'x',ylab = 'f/integratef()')
+lines(sa,saa/k,col='red')
+legend('topright', c('true density','sample density'), lwd = 2, col = c('red','black'))
+```
